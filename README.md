@@ -2,31 +2,47 @@
 
 [![CI](https://github.com/gary1110086/media-player-global-hotkeys/actions/workflows/ci.yml/badge.svg)](https://github.com/gary1110086/media-player-global-hotkeys/actions/workflows/ci.yml)
 
-`MediaPlayerGlobalHotkeys` is a small Windows helper that lets you control the built-in Media Player with global hotkeys even when the player is not focused.
+Chinese version: [README.zh-CN.md](README.zh-CN.md)
 
-It talks to the Windows media session API directly and targets the built-in Media Player session (`Microsoft.ZuneMusic` / `Microsoft.ZuneVideo`) instead of sending generic keystrokes to whatever window happens to be active.
+`MediaPlayerGlobalHotkeys` is a small Windows helper for the built-in Media Player. It gives you a few reliable global hotkeys, so you can play, pause, and seek without dragging the player back to the foreground every time.
 
-## What it does
+Under the hood it talks to the Windows media session API directly instead of sending generic keystrokes to whatever window happens to be active.
 
-- `Ctrl+Alt+Space`: toggle play/pause
+## Quick Start
+
+If you are just here to use the app, this is the only part you need:
+
+1. Open the [latest release](https://github.com/gary1110086/media-player-global-hotkeys/releases/latest).
+2. Download the `MediaPlayerGlobalHotkeys-...zip` asset.
+3. Unzip it anywhere you like.
+4. Run `MediaPlayerGlobalHotkeys.exe`.
+
+Notes:
+
+- The helper has no visible UI. It starts in the background and keeps listening for hotkeys.
+- If the release page also shows `Source code (zip)` and `Source code (tar.gz)`, those are automatic source archives from GitHub. They are for people who want the source, not for people who just want the app.
+
+## Hotkeys
+
+- `Ctrl+Alt+Space`: play or pause
 - `Ctrl+Alt+Left`: seek backward 5 seconds
 - `Ctrl+Alt+Right`: seek forward 5 seconds
-- repeated seek keeps using the latest requested target for a short window, which avoids snapping back to a stale timeline position
-- holding `Ctrl+Alt+Left` or `Ctrl+Alt+Right` triggers repeated seek after a short delay
+- Hold `Ctrl+Alt+Left` or `Ctrl+Alt+Right` to keep seeking after a short delay
 
-## What the main code is
+## Requirements
 
-The main deliverable is the compiled Windows helper:
+- Windows
+- The built-in Media Player app
+- A loaded media session that can actually play and seek
 
-```text
-bin\MediaPlayerGlobalHotkeys.exe
-```
+## Troubleshooting
 
-The PowerShell file `scripts\build.ps1` is only the local build script. It is not the app itself.
+- If nothing happens, make sure Media Player is open and already has playable media loaded.
+- Logs are written to a `logs` folder next to the executable.
 
-The helper has no visible UI. It runs in the background and listens for global hotkeys.
+## For Developers
 
-If you want to read the code starting from the real entry point:
+If you want to inspect the code or build the helper yourself, start here. Otherwise, you can ignore the rest of this README.
 
 - [Program.cs](src/MediaPlayerGlobalHotkeys/Program.cs): application entry point and single-instance startup
 - [HotkeyAppContext.cs](src/MediaPlayerGlobalHotkeys/HotkeyAppContext.cs): background app context and default hotkey bindings
@@ -34,15 +50,7 @@ If you want to read the code starting from the real entry point:
 - [MediaPlayerController.cs](src/MediaPlayerGlobalHotkeys/MediaPlayerController.cs): Windows media session control and seek state handling
 - [build.ps1](scripts/build.ps1): local build script
 
-## How it works
-
-```mermaid
-flowchart LR
-    A[Ctrl+Alt+Space / Left / Right] --> B[LowLevelKeyboardHotkeyMonitor]
-    B --> C[MediaPlayerController]
-    C --> D[Windows media session API]
-    D --> E[Built-in Media Player]
-```
+The local build output is `bin\MediaPlayerGlobalHotkeys.exe`.
 
 ## Build
 
@@ -56,20 +64,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\MediaPlayerGlobalHotkeys.Tests.ps1
 ```
 
-## Run
+## How It Works
 
-```powershell
-.\bin\MediaPlayerGlobalHotkeys.exe
+```mermaid
+flowchart LR
+    A[Ctrl+Alt+Space / Left / Right] --> B[LowLevelKeyboardHotkeyMonitor]
+    B --> C[MediaPlayerController]
+    C --> D[Windows media session API]
+    D --> E[Built-in Media Player]
 ```
 
-Logs are written to `bin\logs\MediaPlayerGlobalHotkeys.log`.
+## Development Notes
 
-## Environment
-
-- Windows
-- built-in Windows Media Player app with a seekable media session
-- .NET Framework compiler from `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe`
-
-## Notes
-
-- a short development note is kept in [development-notes.md](docs/development-notes.md)
+- A short project note is kept in [development-notes.md](docs/development-notes.md).
+- The current local build expects the .NET Framework compiler at `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe`.
