@@ -1,0 +1,12 @@
+bin/
+obj/
+AGENTS.md
+
+*.TMP
+*.tmp
+*.user
+*.suo
+
+.vs/
+
+bin/logs/
