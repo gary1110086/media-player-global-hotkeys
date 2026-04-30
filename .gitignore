@@ -1,5 +1,6 @@
 bin/
 obj/
+dist/
 AGENTS.md
 docs/superpowers/
 

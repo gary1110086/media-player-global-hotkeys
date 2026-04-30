@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify .NET Framework compiler
+        shell: powershell
+        run: |
+          $compiler = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+          if (-not (Test-Path -LiteralPath $compiler)) {
+              throw "Missing compiler: $compiler"
+          }
+
+      - name: Run regression tests
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\MediaPlayerGlobalHotkeys.Tests.ps1
+
+      - name: Upload helper artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MediaPlayerGlobalHotkeys
+          path: bin\MediaPlayerGlobalHotkeys.exe
