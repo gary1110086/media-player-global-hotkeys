@@ -28,11 +28,11 @@ The helper has no visible UI. It runs in the background and listens for global h
 
 If you want to read the code starting from the real entry point:
 
-- [Program.cs](/D:/myListProject/修改播放器/src/MediaPlayerGlobalHotkeys/Program.cs): application entry point and single-instance startup
-- [HotkeyAppContext.cs](/D:/myListProject/修改播放器/src/MediaPlayerGlobalHotkeys/HotkeyAppContext.cs): background app context and default hotkey bindings
-- [LowLevelKeyboardHotkeyMonitor.cs](/D:/myListProject/修改播放器/src/MediaPlayerGlobalHotkeys/LowLevelKeyboardHotkeyMonitor.cs): low-level keyboard hook and held-seek repeat logic
-- [MediaPlayerController.cs](/D:/myListProject/修改播放器/src/MediaPlayerGlobalHotkeys/MediaPlayerController.cs): Windows media session control and seek state handling
-- [build.ps1](/D:/myListProject/修改播放器/scripts/build.ps1): local build script
+- [Program.cs](src/MediaPlayerGlobalHotkeys/Program.cs): application entry point and single-instance startup
+- [HotkeyAppContext.cs](src/MediaPlayerGlobalHotkeys/HotkeyAppContext.cs): background app context and default hotkey bindings
+- [LowLevelKeyboardHotkeyMonitor.cs](src/MediaPlayerGlobalHotkeys/LowLevelKeyboardHotkeyMonitor.cs): low-level keyboard hook and held-seek repeat logic
+- [MediaPlayerController.cs](src/MediaPlayerGlobalHotkeys/MediaPlayerController.cs): Windows media session control and seek state handling
+- [build.ps1](scripts/build.ps1): local build script
 
 ## How it works
 
@@ -73,4 +73,4 @@ Logs are written to `bin\logs\MediaPlayerGlobalHotkeys.log`.
 ## Notes
 
 - generated artifacts under `bin\` and `obj\` are ignored
-- a short development note is kept in [development-notes.md](/D:/myListProject/修改播放器/docs/development-notes.md)
+- a short development note is kept in [development-notes.md](docs/development-notes.md)
