@@ -1,5 +1,7 @@
 # MediaPlayerGlobalHotkeys
 
+[![CI](https://github.com/gary1110086/media-player-global-hotkeys/actions/workflows/ci.yml/badge.svg)](https://github.com/gary1110086/media-player-global-hotkeys/actions/workflows/ci.yml)
+
 `MediaPlayerGlobalHotkeys` is a small Windows helper that lets you control the built-in Media Player with global hotkeys even when the player is not focused.
 
 It talks to the Windows media session API directly and targets the built-in Media Player session (`Microsoft.ZuneMusic` / `Microsoft.ZuneVideo`) instead of sending generic keystrokes to whatever window happens to be active.
@@ -22,6 +24,8 @@ bin\MediaPlayerGlobalHotkeys.exe
 
 The PowerShell file `scripts\build.ps1` is only the local build script. It is not the app itself.
 
+The helper has no visible UI. It runs in the background and listens for global hotkeys.
+
 If you want to read the code starting from the real entry point:
 
 - [Program.cs](/D:/myListProject/修改播放器/src/MediaPlayerGlobalHotkeys/Program.cs): application entry point and single-instance startup
@@ -29,6 +33,16 @@ If you want to read the code starting from the real entry point:
 - [LowLevelKeyboardHotkeyMonitor.cs](/D:/myListProject/修改播放器/src/MediaPlayerGlobalHotkeys/LowLevelKeyboardHotkeyMonitor.cs): low-level keyboard hook and held-seek repeat logic
 - [MediaPlayerController.cs](/D:/myListProject/修改播放器/src/MediaPlayerGlobalHotkeys/MediaPlayerController.cs): Windows media session control and seek state handling
 - [build.ps1](/D:/myListProject/修改播放器/scripts/build.ps1): local build script
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[Ctrl+Alt+Space / Left / Right] --> B[LowLevelKeyboardHotkeyMonitor]
+    B --> C[MediaPlayerController]
+    C --> D[Windows media session API]
+    D --> E[Built-in Media Player]
+```
 
 ## Build
 
