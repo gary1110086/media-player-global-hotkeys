@@ -16,6 +16,11 @@ public static class Program
         Application.SetCompatibleTextRenderingDefault(false);
 
         string[] args = Environment.GetCommandLineArgs().Skip(1).ToArray();
+        if (StartupTaskManager.TryHandleCommand(args, SimpleLog.WriteLine))
+        {
+            return;
+        }
+
         if (DesktopSessionBridge.TryRelaunchOnInteractiveDesktop(args, SimpleLog.WriteLine))
         {
             return;

@@ -22,6 +22,25 @@ function Assert-Equal {
     Write-Host "PASS: $Name"
 }
 
+function Assert-Contains {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Actual,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedFragment
+    )
+
+    if (-not $Actual.Contains($ExpectedFragment)) {
+        throw "Assertion failed for '$Name'. Expected fragment '$ExpectedFragment' was not found."
+    }
+
+    Write-Host "PASS: $Name"
+}
+
 $testAssembly = Import-TestAssembly -RelativeSourceFiles @(
     'src\MediaPlayerGlobalHotkeys\MediaPlayerTarget.cs',
     'src\MediaPlayerGlobalHotkeys\MediaTimelineMath.cs'
@@ -76,7 +95,8 @@ $hotkeyAssembly = Import-TestAssembly -RelativeSourceFiles @(
     'src\MediaPlayerGlobalHotkeys\MediaPlayerTarget.cs',
     'src\MediaPlayerGlobalHotkeys\MediaTimelineMath.cs',
     'src\MediaPlayerGlobalHotkeys\SimpleLog.cs',
-    'src\MediaPlayerGlobalHotkeys\SingleInstanceGate.cs'
+    'src\MediaPlayerGlobalHotkeys\SingleInstanceGate.cs',
+    'src\MediaPlayerGlobalHotkeys\StartupTaskManager.cs'
 )
 
 $bindings = Invoke-StaticMethod -Assembly $hotkeyAssembly -TypeName 'HotkeyAppContext' -MethodName 'GetDefaultBindings'
@@ -130,7 +150,8 @@ $integrationAssembly = Import-TestAssembly -RelativeSourceFiles @(
     'src\MediaPlayerGlobalHotkeys\MediaPlayerTarget.cs',
     'src\MediaPlayerGlobalHotkeys\MediaTimelineMath.cs',
     'src\MediaPlayerGlobalHotkeys\SimpleLog.cs',
-    'src\MediaPlayerGlobalHotkeys\SingleInstanceGate.cs'
+    'src\MediaPlayerGlobalHotkeys\SingleInstanceGate.cs',
+    'src\MediaPlayerGlobalHotkeys\StartupTaskManager.cs'
 )
 
 Assert-Equal -Name 'MediaPlayerController targets the built-in media session app id prefix' `
@@ -186,6 +207,53 @@ Assert-Equal -Name 'Hotkey startup summary reports full registration success' `
 Assert-Equal -Name 'Hotkey startup summary lists failed registrations' `
     -Actual (Invoke-StaticMethod -Assembly $integrationAssembly -TypeName 'HotkeyStartupStatus' -MethodName 'BuildRegistrationSummary' -Arguments @(3, @('TogglePlayPause', 'SeekBackward'))) `
     -Expected 'Registered 1 of 3 hotkeys. Failed: TogglePlayPause, SeekBackward.'
+
+Assert-Equal -Name 'StartupTaskManager exposes a stable task name' `
+    -Actual (Invoke-StaticMethod -Assembly $integrationAssembly -TypeName 'StartupTaskManager' -MethodName 'GetTaskName') `
+    -Expected 'MediaPlayerGlobalHotkeys'
+
+Assert-Equal -Name 'StartupTaskManager recognizes the install command' `
+    -Actual (Invoke-StaticMethod -Assembly $integrationAssembly -TypeName 'StartupTaskManager' -MethodName 'ParseCommandText' -Arguments @('--install-startup-task')) `
+    -Expected 'InstallStartupTask'
+
+Assert-Equal -Name 'StartupTaskManager recognizes the uninstall command' `
+    -Actual (Invoke-StaticMethod -Assembly $integrationAssembly -TypeName 'StartupTaskManager' -MethodName 'ParseCommandText' -Arguments @('--uninstall-startup-task')) `
+    -Expected 'UninstallStartupTask'
+
+Assert-Equal -Name 'StartupTaskManager ignores normal startup arguments' `
+    -Actual (Invoke-StaticMethod -Assembly $integrationAssembly -TypeName 'StartupTaskManager' -MethodName 'ParseCommandText' -Arguments @('--skip-desktop-relaunch')) `
+    -Expected $null
+
+$startupTaskXml = Invoke-StaticMethod `
+    -Assembly $integrationAssembly `
+    -TypeName 'StartupTaskManager' `
+    -MethodName 'BuildTaskXml' `
+    -Arguments @(
+        'C:\Apps\Media Player\MediaPlayerGlobalHotkeys.exe',
+        'DESKTOP\gary15pro',
+        'MediaPlayerGlobalHotkeys',
+        '2026-04-30T22:00:00'
+    )
+
+Assert-Contains -Name 'StartupTaskManager xml uses an interactive logon trigger' `
+    -Actual $startupTaskXml `
+    -ExpectedFragment '<LogonType>InteractiveToken</LogonType>'
+
+Assert-Contains -Name 'StartupTaskManager xml stores the current user' `
+    -Actual $startupTaskXml `
+    -ExpectedFragment '<UserId>DESKTOP\gary15pro</UserId>'
+
+Assert-Contains -Name 'StartupTaskManager xml stores the executable path' `
+    -Actual $startupTaskXml `
+    -ExpectedFragment '<Command>C:\Apps\Media Player\MediaPlayerGlobalHotkeys.exe</Command>'
+
+Assert-Contains -Name 'StartupTaskManager xml stores the working directory' `
+    -Actual $startupTaskXml `
+    -ExpectedFragment '<WorkingDirectory>C:\Apps\Media Player</WorkingDirectory>'
+
+Assert-Contains -Name 'StartupTaskManager xml requests least privilege' `
+    -Actual $startupTaskXml `
+    -ExpectedFragment '<RunLevel>LeastPrivilege</RunLevel>'
 
 $projectRoot = Get-ProjectRoot
 $buildScriptPath = Join-Path $projectRoot 'scripts\build.ps1'

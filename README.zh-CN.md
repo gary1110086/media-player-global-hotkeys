@@ -38,6 +38,20 @@
 - 如果按了没反应，先确认 `Media Player` 已经打开，而且里面真的加载了可播放内容。
 - 运行日志会写到 exe 同目录下的 `logs` 文件夹里。
 
+## 自启动
+
+如果你希望它在你登录 Windows 后自动启动，可以运行：
+
+```powershell
+.\MediaPlayerGlobalHotkeys.exe --install-startup-task
+```
+
+以后如果想把这个计划任务自启动去掉，可以运行：
+
+```powershell
+.\MediaPlayerGlobalHotkeys.exe --uninstall-startup-task
+```
+
 ## 给开发者
 
 如果你是想看源码或自己编译，建议从这些文件开始。否则下面这些内容你都可以先忽略：

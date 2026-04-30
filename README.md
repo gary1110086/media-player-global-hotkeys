@@ -40,6 +40,20 @@ Notes:
 - If nothing happens, make sure Media Player is open and already has playable media loaded.
 - Logs are written to a `logs` folder next to the executable.
 
+## Autostart
+
+If you want the helper to start automatically when you sign in to Windows, run:
+
+```powershell
+.\MediaPlayerGlobalHotkeys.exe --install-startup-task
+```
+
+To remove that Task Scheduler entry later, run:
+
+```powershell
+.\MediaPlayerGlobalHotkeys.exe --uninstall-startup-task
+```
+
 ## For Developers
 
 If you want to inspect the code or build the helper yourself, start here. Otherwise, you can ignore the rest of this README.
