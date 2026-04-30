@@ -72,5 +72,4 @@ Logs are written to `bin\logs\MediaPlayerGlobalHotkeys.log`.
 
 ## Notes
 
-- generated artifacts under `bin\` and `obj\` are ignored
 - a short development note is kept in [development-notes.md](docs/development-notes.md)
